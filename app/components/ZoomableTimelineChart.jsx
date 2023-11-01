@@ -1,26 +1,29 @@
 "use client";
 
-import React, { useRef, useEffect } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import * as d3 from "d3";
 import momentsInHistory from "../constants/data";
+import UICard from "./UICard";
 
 const ZoomableTimelineChart = ({ data }) => {
   const chartRef = useRef();
+  const [selectedEvent, setSelectedEvent] = useState(null);
+
+  console.log(selectedEvent);
 
   useEffect(() => {
-    const margin = { top: 10, right: 20, bottom: 10, left: 20 };
-    const width = 800 - margin.left - margin.right;
+    const margin = { top: 20, right: 20, bottom: 20, left: 20 };
+    const width = 800;
     const height = 400;
 
     const svg = d3
       .select(chartRef.current)
       .append("svg")
       .attr("class", "svg-content")
-      .attr("width", width)
-      .attr("height", height + margin.top + margin.bottom);
+      .attr("width", width + margin.top + margin.bottom)
+      .attr("height", height + margin.left + margin.right);
     // .append("g")
 
-    // Define the time scale for the x-axis (assuming your data contains date/time values)
     const xScale = d3
       .scaleTime()
       .domain([new Date("1900-01-01"), new Date("1999-12-31")]) // Example date range
@@ -28,16 +31,14 @@ const ZoomableTimelineChart = ({ data }) => {
       .nice(d3.timeMonth)
       .clamp(true);
 
-    // Create a simple x-axis
     const xAxis = d3.axisBottom(xScale);
 
     svg
       .append("g")
       .attr("class", "x-axis")
-      .attr("transform", `translate(0, ${height})`)
+      .attr("transform", `translate(${margin.left}, ${height})`)
       .call(xAxis);
 
-    // Loop through the momentsInHistory array and create rectangles for each event
     const eventRectangles = svg
       .selectAll(".event-rectangle")
       .data(momentsInHistory)
@@ -50,23 +51,22 @@ const ZoomableTimelineChart = ({ data }) => {
         (event) =>
           xScale(new Date(event.endDate)) - xScale(new Date(event.startDate))
       )
-      .attr("height", 20)
-      .attr("y", height - 20)
-      .attr("fill", "blue");
+      .attr("height", 60)
+      .attr("y", height - 60)
+      .attr("fill", (event) => `${event.color}`)
+      .on("click", function () {
+        setSelectedEvent(this.__data__);
+      });
 
-    // Zoom behavior
     const zoom = d3.zoom().on("zoom", zoomed);
     svg.call(zoom);
 
-    // Define the zoom function
     function zoomed(event) {
       const transform = event.transform;
 
-      // Update the xScale's domain based on the zoom transformation
       const newXScale = transform.rescaleX(xScale);
       svg.select(".x-axis").call(xAxis.scale(newXScale));
 
-      // Update the position of event rectangles
       svg
         .selectAll(".event-rectangle")
         .attr("x", (d) => newXScale(new Date(d.startDate)))
@@ -82,7 +82,13 @@ const ZoomableTimelineChart = ({ data }) => {
     };
   }, [data]);
 
-  return <div className="chart-ref" ref={chartRef}></div>;
+  return (
+    <>
+      <div className="chart-ref" ref={chartRef}>
+        {selectedEvent && <UICard moment={selectedEvent} />}
+      </div>
+    </>
+  );
 };
 
 export default ZoomableTimelineChart;

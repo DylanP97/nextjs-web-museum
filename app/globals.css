@@ -26,8 +26,11 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+.chart-ref {
+  position: relative;
+}
 
 .svg-content {
-  background-color: slategray;
-  margin: 1rem;
+  background-color: rgba(112, 128, 144, 0.289);
+  margin: 2rem;
 }
