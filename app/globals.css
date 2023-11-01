@@ -25,3 +25,9 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+
+.svg-content {
+  background-color: slategray;
+  margin: 1rem;
+}
