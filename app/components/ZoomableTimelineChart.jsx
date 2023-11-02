@@ -9,12 +9,10 @@ const ZoomableTimelineChart = ({ data }) => {
   const chartRef = useRef();
   const [selectedEvent, setSelectedEvent] = useState(null);
 
-  console.log(selectedEvent);
-
   useEffect(() => {
     const margin = { top: 20, right: 20, bottom: 20, left: 20 };
-    const width = 800;
-    const height = 400;
+    const width = 1200;
+    const height = 300;
 
     const svg = d3
       .select(chartRef.current)
@@ -22,11 +20,10 @@ const ZoomableTimelineChart = ({ data }) => {
       .attr("class", "svg-content")
       .attr("width", width + margin.top + margin.bottom)
       .attr("height", height + margin.left + margin.right);
-    // .append("g")
 
     const xScale = d3
       .scaleTime()
-      .domain([new Date("1900-01-01"), new Date("1999-12-31")]) // Example date range
+      .domain([new Date("1900-01-01"), new Date("1999-12-31")])
       .range([0, width])
       .nice(d3.timeMonth)
       .clamp(true);
@@ -83,11 +80,9 @@ const ZoomableTimelineChart = ({ data }) => {
   }, [data]);
 
   return (
-    <>
-      <div className="chart-ref" ref={chartRef}>
-        {selectedEvent && <UICard moment={selectedEvent} />}
-      </div>
-    </>
+    <div className="chart-ref" ref={chartRef}>
+      {selectedEvent && <UICard moment={selectedEvent} state={setSelectedEvent} />}
+    </div>
   );
 };
 
